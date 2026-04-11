@@ -1,0 +1,1 @@
+A search engine consists of a crawler, an indexer, and a searcher. The searcher handles user queries using models like TF-IDF.

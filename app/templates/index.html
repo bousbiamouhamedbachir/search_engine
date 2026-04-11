@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[70vh]">
+    <div class="mb-8">
+        <h1 class="text-6xl font-bold tracking-tight text-[#4285F4] flex items-center gap-2">
+            <span>S</span><span class="text-[#EA4335]">e</span><span class="text-[#FBBC05]">a</span><span
+                class="text-[#4285F4]">r</span><span class="text-[#34A853]">c</span><span
+                class="text-[#EA4335]">h</span>
+            <span class="text-gray-400 text-3xl font-normal ml-2">Vector</span>
+        </h1>
+    </div>
+
+    <form action="/" method="POST" class="w-full max-w-2xl px-4">
+        <div class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400 group-focus-within:text-[#4285F4]" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <input type="text" name="query" placeholder="Search with vectorriel model..." required
+                class="block w-full pl-12 pr-4 py-4 rounded-full border border-transparent shadow-lg hover:shadow-xl focus:shadow-xl focus:border-gray-200 outline-none transition-all duration-200 bg-white text-lg">
+        </div>
+
+        <div class="mt-8 flex justify-center gap-4">
+            <button type="submit"
+                class="px-6 py-2 bg-[#f8f9fa] border border-transparent hover:border-gray-300 hover:shadow-md rounded text-[#3c4043] font-medium transition-all">
+                Vector Search
+            </button>
+            <button type="button" onclick="window.location.href='/?json=1'"
+                class="px-6 py-2 bg-[#f8f9fa] border border-transparent hover:border-gray-300 hover:shadow-md rounded text-[#3c4043] font-medium transition-all">
+                JSON API
+            </button>
+        </div>
+    </form>
+
+    {% if error %}
+    <div class="mt-4 text-red-500 font-medium">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Upload Section -->
+    <div class="mt-16 w-full max-w-2xl px-4">
+        <div
+            class="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center justify-center transition-all hover:shadow-md">
+            <h3 class="text-lg font-medium text-gray-700 mb-2">Index a new document</h3>
+            <p class="text-sm text-gray-500 mb-6 text-center">Support for .txt, .pdf, .docx, .xlsx, .pptx<br>Files are
+                uploaded securely to GoFile Cloud and indexed in the background.</p>
+
+            <form id="uploadForm" class="w-full flex flex-col items-center">
+                <input type="file" id="fileInput" name="file" class="hidden" accept=".txt,.pdf,.docx,.xlsx,.pptx"
+                    onchange="handleFileSelect(event)">
+                <label for="fileInput"
+                    class="cursor-pointer px-6 py-3 bg-[#e8f0fe] text-[#1a73e8] hover:bg-[#d2e3fc] font-medium rounded-full transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
+                    Choose Document
+                </label>
+                <div id="fileInfo" class="mt-4 text-sm text-gray-600 hidden flex items-center gap-4">
+                    <span id="fileName" class="font-medium"></span>
+                    <button type="button" onclick="uploadFile()"
+                        class="px-4 py-1.5 bg-[#4285F4] text-white rounded text-sm hover:bg-[#3367d6] transition-colors shadow-sm">Upload
+                        to Cloud</button>
+                </div>
+                <div id="uploadStatus" class="mt-3 text-sm hidden"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').classList.remove('hidden');
+            document.getElementById('uploadStatus').classList.add('hidden');
+        }
+    }
+
+    async function uploadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const statusEl = document.getElementById('uploadStatus');
+        statusEl.textContent = 'Uploading to GoFile and enqueuing for background indexing...';
+        statusEl.className = 'mt-3 text-sm text-[#4285F4] flex items-center gap-2';
+        statusEl.classList.remove('hidden');
+        document.getElementById('fileInfo').classList.add('hidden'); // hide after click
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                statusEl.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span class="text-green-600 font-medium">Upload successful!</span> Indexed shortly.`;
+                fileInput.value = ''; // Reset
+            } else {
+                statusEl.textContent = 'Error: ' + (data.error || 'Upload failed');
+                statusEl.className = 'mt-3 text-sm text-red-500';
+            }
+        } catch (error) {
+            statusEl.textContent = 'Network error. Please try again.';
+            statusEl.className = 'mt-3 text-sm text-red-500';
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header / Search Bar -->
+    <div class="flex items-center gap-6 mb-8 mt-4">
+        <h1 class="text-2xl font-bold text-[#4285F4]">
+            <a href="/">Search<span class="text-gray-400 text-sm font-normal ml-1">V</span></a>
+        </h1>
+        <form action="/" method="POST" class="flex-1 max-w-2xl">
+            <div class="relative">
+                <input type="text" name="query" value="{{ query }}"
+                    class="block w-full pl-6 pr-12 py-2 rounded-full border border-gray-200 shadow hover:shadow-md focus:shadow-md outline-none transition-all bg-white">
+                <button type="submit" class="absolute inset-y-0 right-0 pr-4 flex items-center">
+                    <svg class="h-5 w-5 text-[#4285F4]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="text-sm text-gray-500 mb-6 px-1">
+        About {{ total }} results for "{{ query }}"
+    </div>
+
+    <!-- Results -->
+    <div class="space-y-8">
+        {% for res in results %}
+        <div class="group">
+            <div class="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                <span>{{ res.filename }}</span>
+                <span>•</span>
+                <span>Uploaded: {{ res.uploaded_at }}</span>
+            </div>
+            <h3 class="text-xl text-[#1a0dab] group-hover:underline cursor-pointer font-normal mb-1">
+                <a href="/filee?id={{ res.result_id }}" target="_blank">{{ res.filename }}</a>
+            </h3>
+            <p class="text-sm text-[#4d5156] leading-relaxed">
+                Score: <span class="font-bold text-[#34A853]">{{ res.score }}</span> (Vectorial Similarity).
+                Matches found in file content using TF-IDF model.
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not results %}
+    <div class="mt-12 text-center text-gray-500">
+        No results found for "{{ query }}".
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if pages > 1 %}
+    <div class="mt-12 flex gap-4 text-sm text-[#1a0dab]">
+        {% for p in range(1, pages + 1) %}
+        <a href="/?page={{ p }}&query={{ query }}"
+            class="{% if p == page %}font-bold text-black no-underline{% else %}hover:underline{% endif %} px-2">
+            {{ p }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+This is a test document specifically uploaded to verify the GoFile integration and the background text parsing and indexing subprocess. It contains unique words like GoFileTester and IndexerBotXX123.

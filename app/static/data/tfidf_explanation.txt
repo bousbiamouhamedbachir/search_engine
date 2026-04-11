@@ -1,0 +1,1 @@
+TF-IDF stands for term frequency-inverse document frequency, a numerical statistic that is intended to reflect how important a word is to a document.
