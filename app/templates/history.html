@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="results-header animate-fade-in">
+        <h2>Search History</h2>
+        <p style="color: var(--text-secondary);">Your recent search queries and their timing.</p>
+    </div>
+
+    <div class="card animate-fade-in" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="background: rgba(255,255,255,0.05);">
+                    <th style="padding: 1rem 1.5rem; color: var(--text-secondary);">Query</th>
+                    <th style="padding: 1rem 1.5rem; color: var(--text-secondary);">Date & Time</th>
+                    <th style="padding: 1rem 1.5rem; color: var(--text-secondary);">Results Found</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for search in history %}
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1rem 1.5rem; font-weight: 500;">{{ search.query }}</td>
+                    <td style="padding: 1rem 1.5rem; color: var(--text-secondary);">{{ search.at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td style="padding: 1rem 1.5rem;">
+                        <span class="badge">{{ search.results|length }}</span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+                        No search history yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

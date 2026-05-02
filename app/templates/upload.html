@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 600px;">
+    <div class="card animate-fade-in">
+        <h2 style="margin-bottom: 1rem;">Upload Document</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Add new documents to the search index. We support .txt, .pdf, .docx, .xlsx, and .pptx files.</p>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="fileInput">Choose a document</label>
+                <input type="file" id="fileInput" name="file" class="file-input" accept=".txt,.pdf,.docx,.xlsx,.pptx" required>
+            </div>
+            <button type="submit" class="search-btn" style="position: static; transform: none; width: 100%; padding: 1rem;">
+                <i class="fa-solid fa-upload"></i> Upload & Index
+            </button>
+        </form>
+        
+        <div id="status" style="margin-top: 1.5rem; display: none; padding: 1rem; border-radius: 0.75rem;"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('uploadForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const statusDiv = document.getElementById('status');
+    
+    statusDiv.style.display = 'block';
+    statusDiv.style.background = 'rgba(56, 189, 248, 0.1)';
+    statusDiv.style.color = 'var(--accent)';
+    statusDiv.textContent = 'Uploading...';
+    
+    try {
+        const response = await fetch("{{ url_for('web.upload_file') }}", {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+        
+        if (response.ok) {
+            statusDiv.style.background = 'rgba(52, 211, 153, 0.1)';
+            statusDiv.style.color = '#34d399';
+            statusDiv.innerHTML = `<i class="fa-solid fa-check"></i> ${result.message}`;
+        } else {
+            throw new Error(result.error || 'Upload failed');
+        }
+    } catch (err) {
+        statusDiv.style.background = 'rgba(248, 113, 113, 0.1)';
+        statusDiv.style.color = '#f87171';
+        statusDiv.textContent = err.message;
+    }
+};
+</script>
+{% endblock %}

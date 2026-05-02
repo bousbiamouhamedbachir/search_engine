@@ -5,7 +5,7 @@ from datetime import datetime
 from app import create_app, db
 from app.models import File, Word, Redundace
 from app.services.parser_service import extract_text
-from app.services.search_service import tokenize, update_file_tfidf
+from app.services.search_service import update_file_tfidf
 
 def download_file(url, local_path):
     try:
